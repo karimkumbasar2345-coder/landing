@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meto — Living project memory</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">M</div>
+      Meto
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <div class="nav-item active" data-view="today">Today</div>
+      <div class="nav-item" data-view="state">Project State</div>
+      <div class="nav-item" data-view="decisions">Decisions</div>
+      <div class="nav-item" data-view="conflicts">Conflicts <span class="count" id="nav-conflicts-count"></span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Projects</div>
+      <div class="nav-item" style="pointer-events:none;">Meto <span class="dot"></span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="view active" id="view-upload">
+      <h1>Meto</h1>
+      <div class="subtitle">Verifiable working memory for projects</div>
+      <p class="briefing" style="margin-top:32px;">
+        Загрузите экспорт Telegram-чата. Meto просканирует сообщения, найдёт решения, конфликты, смены ответственных, блокеры и открытые вопросы — и покажет актуальное состояние проекта.
+      </p>
+      <div id="error-box-container"></div>
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">Перетащите сюда экспорт Telegram</div>
+        <div class="upload-hint">
+          Поддерживается <code>result.json</code> из Telegram Desktop.<br>
+          Данные обрабатываются локально в браузере.<br>
+          <span style="color:#bbb;">Шифрованные бэкапы (.tar.gz) не подойдут.</span>
+        </div>
+        <input type="file" id="file-input" accept=".json,application/json" style="display:none;">
+      </div>
+      <div style="text-align:center;">
+        <button class="demo-btn" onclick="loadDemo()">Показать на демо-данных</button>
+      </div>
+      <div class="footer-note">
+        Если у вас нет экспорта — нажмите «Показать на демо-данных».
+      </div>
+    </div>
+
+    <div class="view" id="view-parsing">
+      <div class="parsing">
+        <div class="spinner"></div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:6px;">Разбираем сообщения…</div>
+        <div style="font-size:13px;">Ищем решения, конфликты и изменения</div>
+      </div>
+    </div>
+
+    <div class="view" id="view-today">
+      <div class="page-header">
+        <div>
+          <h1>Today</h1>
+          <div class="subtitle" id="today-date"></div>
+        </div>
+        <div class="checkpoint">
+          Changes since your last review
+          <div style="font-size:12px;color:#666;margin-top:4px;" id="checkpoint-time"></div>
+          <button class="checkpoint-btn" onclick="alert('Reviewed through now. Checkpoint saved.')">Reviewed through now</button>
+        </div>
+      </div>
+      <p class="briefing" id="briefing-text"></p>
+      <div class="source-count" id="source-count"></div>
+      <div class="stats" id="stats-block"></div>
+      <div class="section-label">Needs attention</div>
+      <div id="attention-cards"></div>
+      <div class="section-label">Meaningful changes</div>
+      <div id="changes-cards"></div>
+      <div class="section-label">Open questions</div>
+      <div id="questions-cards"></div>
+      <div class="footer-note">
+        <button class="demo-btn" style="background:#fff;color:#1a1a1a;border:1px solid #d4d0c8;" onclick="resetToUpload()">← Загрузить другой файл</button>
+      </div>
+    </div>
+
+    <div class="view" id="view-state">
+      <h1>Project State</h1>
+      <div class="subtitle" id="state-subtitle">Meto</div>
+
+      <div class="section-label">Identity</div>
+      <div class="state-block">
+        <div style="font-size:15px;color:#444;">
+          Meto is a living, verifiable project memory. It connects a team's working sources and maintains a current understanding of what is happening, what changed, and why.
+        </div>
+      </div>
+
+      <div class="section-label">Current state</div>
+      <div class="state-block" id="state-current"></div>
+
+      <div class="section-label">What changed</div>
+      <div id="state-changes"></div>
+
+      <div class="section-label">Ownership</div>
+      <div id="state-owners"></div>
+
+      <div class="section-label">Attention</div>
+      <div id="state-attention"></div>
+    </div>
+
+    <div class="view" id="view-decisions">
+      <h1>Decisions</h1>
+      <div class="subtitle">All decisions with history and evidence</div>
+      <div id="decisions-list"></div>
+    </div>
+
+    <div class="view" id="view-conflicts">
+      <h1>Conflicts</h1>
+      <div class="subtitle">All unresolved conflicts between sources</div>
+      <div id="conflicts-list"></div>
+    </div>
+
+    <div class="view" id="view-detail">
+      <button class="back-btn" onclick="goBack()">← Назад</button>
+      <div id="detail-content"></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
