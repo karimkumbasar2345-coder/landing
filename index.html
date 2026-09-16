@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Meto — Верифицируемая память проекта и темпоральные решения</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- 1. INLINE SVG SYMBOL SPRITE (ZERO EXTERNAL ASSETS) -->
+  <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></symbol>
+    <symbol id="icon-superseded" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></symbol>
+    <symbol id="icon-conflict" viewBox="0 0 24 24"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></symbol>
+    <symbol id="icon-uncertain" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
+    <symbol id="icon-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
+    <symbol id="icon-stale" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></symbol>
+    <symbol id="icon-quote" viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></symbol>
+    <symbol id="icon-doc" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></symbol>
+    <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></symbol>
+    <symbol id="icon-tracker" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></symbol>
+    <symbol id="icon-transcript" viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></symbol>
+  </svg>
+
+  <!-- 2. HERO / LANDING VIEW (#view-landing) -->
+  <section id="view-landing">
+    <nav class="hero-nav">
+      <div class="brand">
+        <div class="brand-mark">M</div>
+        <span class="brand-name">Meto</span>
+        <span class="brand-pill">v2.0 Standalone Offline</span>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <button class="btn btn-ghost" onclick="MetoRouter.showAppView('conflicts')">
+          <span>Сценарий 2: Конфликт СУБД</span>
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="MetoRouter.showAppView('today')">
+          <span>Открыть демо продукта →</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="hero-container">
+      <div class="hero-headline-group">
+        <div class="hero-badge">
+          <span class="pulse"></span>
+          <span>Верифицируемая память проектов · 30-секундный обзор</span>
+        </div>
+        <h1 class="hero-title">
+          Ваша команда помнит, что решили на прошлой неделе?
+        </h1>
+        <p class="hero-subtitle">
+          Meto соединяет чаты, тикеты и код — и поддерживает актуальное <strong>состояние проекта</strong>.
+          Если источники противоречат, Meto не угадывает победителя по таймстампу, а фиксирует конфликт с доказательствами.
+          Здесь зафиксированы проверяемые факты и темпоральные решения.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="MetoRouter.showAppView('today')">
+            <span>Открыть демо</span>
+            <svg class="ui-icon"><use href="#icon-arrow-right"></use></svg>
+          </button>
+          <button class="btn btn-secondary" onclick="MetoDrawer.open('memo-scenario-1')">
+            <span>Посмотреть пример решения (Сценарий 1: Релиз)</span>
+          </button>
+          <button class="btn btn-secondary" onclick="MetoDrawer.open('memo-scenario-2')">
+            <span>Сценарий 2: Конфликт СУБД</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Interactive Window Preview -->
+      <div class="hero-preview">
+        <div class="preview-header">
+          <span class="preview-dot red"></span>
+          <span class="preview-dot yellow"></span>
+          <span class="preview-dot green"></span>
+          <span class="preview-title">Meto · Финтех v2.4 (Кликабельный предпросмотр памяти)</span>
+        </div>
+        <div class="preview-body">
+          <!-- Preview Card 1: Conflict (Scenario 2) -->
+          <div class="preview-card conflict" onclick="MetoDrawer.open('memo-scenario-2')" title="Нажмите для открытия Auditable Memo">
+            <div class="preview-card-left">
+              <div class="preview-tag">⚡ Конфликт источников · Текущее значение не установлено</div>
+              <div class="preview-card-title">Выбор основной СУБД: PostgreSQL 16 (ADR-04) vs MySQL 8.0 (Sync #28)</div>
+              <div class="preview-sources">
+                <span class="source-pill">Confluence ADR-04 · 3 сен</span>
+                <span class="source-pill">Стенограмма синка #28 · 5 сен</span>
+                <span class="source-pill" style="color: #b45309; font-weight: 700;">Без автоматического победителя</span>
+              </div>
+            </div>
+            <span class="status-badge status-conflict sm">
+              <span class="status-glyph">⚡</span>
+              <span>КОНФЛИКТ</span>
+            </span>
+          </div>
+
+          <!-- Preview Card 2: Release Shift & Desync (Scenario 1) -->
+          <div class="preview-card supported" onclick="MetoDrawer.open('memo-scenario-1')" title="Нажмите для открытия Auditable Memo">
+            <div class="preview-card-left">
+              <div class="preview-tag" style="display: flex; gap: 8px; align-items: center;">
+                <span>◈ Изменение даты релиза: 12 сентября → 15 сентября</span>
+                <span class="badge-stale" style="padding: 1px 6px; font-size: 9px;">РАССИНХРОН JIRA НА 5 ДНЕЙ</span>
+              </div>
+              <div class="preview-card-title">Причина: Задержка авторизации со стороны эквайера (нет тестовых ключей OAuth callback)</div>
+              <div class="preview-sources">
+                <span class="source-pill">Telegram @pay_core_dev · 11 сен</span>
+                <span class="source-pill">Jira PAY-104 (отстаёт, 12 сен)</span>
+              </div>
+            </div>
+            <span class="status-badge status-supported sm">
+              <span class="status-glyph">◈</span>
+              <span>ПОДТВЕРЖДЕНО</span>
+            </span>
+          </div>
+
+          <!-- Preview Card 3: Current Fact -->
+          <div class="preview-card current" onclick="MetoRouter.showAppView('state')" title="Перейти в состояние проекта">
+            <div class="preview-card-left">
+              <div class="preview-tag" style="color: #0d652d;">✓ Утверждённый базис архитектуры</div>
+              <div class="preview-card-title">Архитектурный стек ядра: микросервис на Go · 3 источника</div>
+            </div>
+            <span class="status-badge status-current sm">
+              <span class="status-glyph">✓</span>
+              <span>УТВЕРЖДЕНО</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 30-Second Comparison Card -->
+      <div class="comparison-section">
+        <div class="comparison-header">
+          <h2>Почему поиск, чат-боты и Jira не решают проблему потери контекста</h2>
+          <p>Разница между наивным поиском сообщений и верифицируемым темпоральным графом решений Meto</p>
+        </div>
+        <div class="comparison-grid">
+          <!-- Column 1 -->
+          <div class="comparison-card">
+            <div class="comparison-card-title">
+              <svg class="ui-icon" style="color: #6b7280;"><use href="#icon-chat"></use></svg>
+              <span>Хаос чатов (Telegram / Slack)</span>
+            </div>
+            <ul class="comparison-card-list">
+              <li><span class="comparison-bullet" style="color: #ef4444;">✕</span><span>Договорённости тонут в тысячах сообщений и тредов.</span></li>
+              <li><span class="comparison-bullet" style="color: #ef4444;">✕</span><span>Анти-паттерн: последнее сообщение в чате считается истиной без проверки.</span></li>
+              <li><span class="comparison-bullet" style="color: #ef4444;">✕</span><span>Причины отказа от альтернатив испаряются через 2 недели.</span></li>
+            </ul>
+          </div>
+
+          <!-- Column 2 -->
+          <div class="comparison-card">
+            <div class="comparison-card-title">
+              <svg class="ui-icon" style="color: #6b7280;"><use href="#icon-tracker"></use></svg>
+              <span>Обычный трекер (Jira / Linear)</span>
+            </div>
+            <ul class="comparison-card-list">
+              <li><span class="comparison-bullet" style="color: #ef4444;">✕</span><span>Тикеты быстро отстают от реальности (рассинхрон дедлайнов).</span></li>
+              <li><span class="comparison-bullet" style="color: #ef4444;">✕</span><span>Статус «In Progress» не объясняет, почему изменилась архитектура.</span></li>
+              <li><span class="comparison-bullet" style="color: #ef4444;">✕</span><span>Превращается в кладбище задач, которому никто не доверяет.</span></li>
+            </ul>
+          </div>
+
+          <!-- Column 3: METO HIGHLIGHT -->
+          <div class="comparison-card highlight">
+            <div class="comparison-card-title">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg class="ui-icon" style="color: #1b5e20;"><use href="#icon-current"></use></svg>
+                <span>Meto (Темпоральная память)</span>
+              </div>
+              <span class="brand-pill" style="background: #121212; color: #ffffff; border-color: #121212;">Решение Meto</span>
+            </div>
+            <ul class="comparison-card-list">
+              <li><span class="comparison-bullet" style="color: #16a34a;">✓</span><span><strong>5 темпоральных состояний:</strong> ПОДТВЕРЖДЕНО, ЗАМЕНЕНО, КОНФЛИКТ, НЕ ОПРЕДЕЛЕНО, УТВЕРЖДЕНО.</span></li>
+              <li><span class="comparison-bullet" style="color: #16a34a;">✓</span><span><strong>Инвариант управления:</strong> При противоречии «Текущее значение не установлено» — таймстамп не выбирает победителя!</span></li>
+              <li><span class="comparison-bullet" style="color: #16a34a;">✓</span><span><strong>Auditable Memo:</strong> Дословные цитаты первоисточников, фиксация рассинхрона трекера на 5 дней.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Feature Pillars -->
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📌</div>
+          <div class="feature-title">Актуальное состояние</div>
+          <div class="feature-text">Структурированный срез фактов по 5 доменам с указанием подтверждающих источников.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Конфликты видны</div>
+          <div class="feature-text">Когда Confluence и стенограмма противоречат — Meto останавливает догадки и ждет решения.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <div class="feature-title">Доказательства</div>
+          <div class="feature-text">Каждое утверждение снабжено дословной цитатой и автором из первоисточника.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">↺</div>
+          <div class="feature-title">История решений</div>
+          <div class="feature-text">Предыдущие договоренности сохраняются в статусе ЗАМЕНЕНО без перечеркивания.</div>
+        </div>
+      </div>
+
+      <!-- Landing Footer -->
+      <footer style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; color: var(--text-tertiary); font-size: 12px; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-weight: 700; color: var(--text-primary);">Meto</span>
+          <span>© 2026 · Система верифицируемой памяти проектов и темпоральных решений</span>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <span class="brand-pill">100% Offline Standalone</span>
+          <button class="btn btn-primary btn-sm" onclick="MetoRouter.showAppView('today')">
+            <span>Открыть демо продукта →</span>
+          </button>
+        </div>
+      </footer>
+
+    </div>
+  </section>
+<!-- 3. APPLICATION SHELL (#view-app) -->
+  <div id="view-app" class="shell-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo" style="font-size: 16px;">
+          <span>Meto</span>
+          <span class="brand-pill">Offline</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="MetoRouter.showLanding()" title="Вернуться к презентации">
+          <span>Обзор</span>
+        </button>
+      </div>
+
+      <div class="project-card">
+        <div class="project-card-title">Финтех · Модуль оплаты v2.4</div>
+        <div class="project-card-audit">Аудит: 16 сентября 2026, 16:30</div>
+      </div>
+
+      <ul class="nav-list">
+        <li>
+          <div class="nav-item active" data-view="today" onclick="MetoRouter.navigate('today')">
+            <div class="nav-item-left">
+              <svg class="ui-icon"><use href="#icon-calendar"></use></svg>
+              <span>Сегодня</span>
+            </div>
+            <span class="nav-badge-count">4</span>
+          </div>
+        </li>
+        <li>
+          <div class="nav-item" data-view="state" onclick="MetoRouter.navigate('state')">
+            <div class="nav-item-left">
+              <svg class="ui-icon"><use href="#icon-doc"></use></svg>
+              <span>Состояние проекта</span>
+            </div>
+            <span class="nav-badge-count">10</span>
+          </div>
+        </li>
+        <li>
+          <div class="nav-item" data-view="decisions" onclick="MetoRouter.navigate('decisions')">
+            <div class="nav-item-left">
+              <svg class="ui-icon"><use href="#icon-check"></use></svg>
+              <span>Решения</span>
+            </div>
+            <span class="nav-badge-count">3</span>
+          </div>
+        </li>
+        <li>
+          <div class="nav-item" data-view="conflicts" onclick="MetoRouter.navigate('conflicts')">
+            <div class="nav-item-left">
+              <svg class="ui-icon"><use href="#icon-conflict"></use></svg>
+              <span>Конфликты</span>
+            </div>
+            <span class="nav-badge-count" style="background: #fef3c7; color: #b45309;">1</span>
+          </div>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <span>Горячие клавиши:</span>
+          <button id="reset-demo-btn" class="btn-text-subtle" onclick="MetoApp.resetDemo()" title="Сбросить изменения демо к исходному состоянию" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--bg-surface-subtle); border: 1px solid var(--border-subtle); cursor: pointer; color: var(--text-secondary);">Сброс демо</button>
+        </div>
+        <div class="hotkey-list">
+          <span class="hotkey-pill">1</span> Сегодня
+          <span class="hotkey-pill">2</span> Статус
+          <span class="hotkey-pill">3</span> Решения
+          <span class="hotkey-pill">4</span> Конфликты
+          <span class="hotkey-pill">Esc</span> Закрыть
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="mobile-topbar">
+        <div class="brand">
+          <div class="brand-mark sm" style="width: 26px; height: 26px; font-size: 13px;">M</div>
+          <span class="brand-name" style="font-size: 16px;">Meto</span>
+          <span class="brand-pill">Offline</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="MetoRouter.showLanding()">
+          <span>← Главная</span>
+        </button>
+      </div>
+
+      <!-- PANE 1: СЕГОДНЯ (#pane-today) -->
+      <section id="pane-today" class="view-pane active">
+        <div class="pane-header">
+          <div class="pane-header-title-row">
+            <h1>Сегодня</h1>
+            <button class="btn btn-secondary btn-sm" onclick="MetoDrawer.open('memo-scenario-1')">
+              <span>Сценарий 1: Перенос даты</span>
+            </button>
+          </div>
+          <p class="pane-header-desc">Что изменилось и что требует управленческого внимания прямо сейчас.</p>
+        </div>
+
+        <div class="attention-banner">
+          <div class="attention-content">
+            <div class="attention-icon-box">!</div>
+            <div>
+              <div class="attention-text-title">Требует внимания: 1 конфликт архитектуры и 1 рассинхронизация трекера</div>
+              <div class="attention-text-desc">В Jira зафиксирован устаревший дедлайн (12 сен), а по СУБД биллинга нет консенсуса между ADR-04 и синком команды.</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-primary btn-sm" onclick="MetoDrawer.open('memo-scenario-2')">
+              <span>Изучить конфликт СУБД</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="MetoDrawer.open('memo-scenario-1')">
+              <span>Проверить рассинхрон Jira</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card" style="border-left: 3px solid #f59e0b; cursor: pointer;" onclick="MetoRouter.navigate('conflicts')">
+            <div class="metric-card-top">
+              <span>АКТИВНЫЙ КОНФЛИКТ</span>
+              <svg class="ui-icon" style="color: #f59e0b;"><use href="#icon-conflict"></use></svg>
+            </div>
+            <div class="metric-card-val" id="metric-conflicts">1</div>
+            <div class="metric-card-desc">СУБД транзакционного ядра (PostgreSQL vs MySQL)</div>
+          </div>
+
+          <div class="metric-card" style="border-left: 3px solid #ef4444; cursor: pointer;" onclick="MetoDrawer.open('memo-scenario-1')">
+            <div class="metric-card-top">
+              <span>РАССИНХРОН ТРЕКЕРА</span>
+              <svg class="ui-icon" style="color: #ef4444;"><use href="#icon-stale"></use></svg>
+            </div>
+            <div class="metric-card-val" id="metric-desyncs">1</div>
+            <div class="metric-card-desc">Jira PAY-104 отстаёт на 5 дней от решения в чате</div>
+          </div>
+
+          <div class="metric-card" style="border-left: 3px solid #10b981; cursor: pointer;" onclick="MetoRouter.navigate('decisions')">
+            <div class="metric-card-top">
+              <span>РЕШЕНИЙ В СПРИНТЕ</span>
+              <svg class="ui-icon" style="color: #10b981;"><use href="#icon-check"></use></svg>
+            </div>
+            <div class="metric-card-val" id="metric-decisions">5</div>
+            <div class="metric-card-desc">Все решения имеют обоснование и rejected-альтернативы</div>
+          </div>
+
+          <div class="metric-card" style="border-left: 3px solid #8b5cf6;">
+            <div class="metric-card-top">
+              <span>ОТКРЫТЫЕ ВОПРОСЫ</span>
+              <svg class="ui-icon" style="color: #8b5cf6;"><use href="#icon-uncertain"></use></svg>
+            </div>
+            <div class="metric-card-val" id="metric-questions">2</div>
+            <div class="metric-card-desc">Формат внешнего пилота и утечка формата ошибок</div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>Изменения и динамика фактов</span>
+        </div>
+        <div class="facts-list" id="today-recent-changes"></div>
+
+        <div class="section-title">
+          <span>Открытые вопросы и неопределенности (UNCERTAIN)</span>
+        </div>
+        <div class="facts-list" id="today-open-questions"></div>
+      </section>
+
+      <!-- PANE 2: СОСТОЯНИЕ ПРОЕКТА (#pane-state) -->
+      <section id="pane-state" class="view-pane">
+        <div class="pane-header">
+          <h1>Состояние проекта</h1>
+          <p class="pane-header-desc">Полный структурированный срез проверенных фактов по доменам с указанием темпорального статуса и источников.</p>
+        </div>
+        <div id="state-domains-container"></div>
+      </section>
+
+      <!-- PANE 3: РЕШЕНИЯ (#pane-decisions) -->
+      <section id="pane-decisions" class="view-pane">
+        <div class="pane-header">
+          <h1>Решения и их обоснование</h1>
+          <p class="pane-header-desc">Хронологический реестр принятых соглашений: кто решил, почему, что было до этого и какие альтернативы отклонены.</p>
+        </div>
+        <div class="decisions-timeline" id="decisions-timeline-container"></div>
+      </section>
+
+      <!-- PANE 4: КОНФЛИКТЫ (#pane-conflicts) -->
+      <section id="pane-conflicts" class="view-pane">
+        <div class="pane-header">
+          <h1>Конфликты источников</h1>
+          <p class="pane-header-desc">Взаимоисключающие утверждения командных источников, требующие явного решения руководства.</p>
+        </div>
+
+        <div class="conflict-invariant-banner">
+          <div class="conflict-banner-top">
+            <svg class="ui-icon" style="color: #b45309;"><use href="#icon-conflict"></use></svg>
+            <span class="conflict-banner-title">ТЕМПОРАЛЬНЫЙ ПРИНЦИП METO: НОВЕЙШЕЕ СООБЩЕНИЕ НЕ ПОБЕЖДАЕТ АВТОМАТИЧЕСКИ</span>
+          </div>
+          <div class="conflict-banner-rule">
+            Meto зафиксировал взаимоисключающие утверждения с подтверждением в первоисточниках.
+            В отличие от наивных чат-ботов и поисковиков, система <strong>не выбирает MySQL автоматически по таймстампу (5 сен > 3 сен)</strong>.
+            Пока техсовет или тимлид явно не утвердит решение, статус сущности остаётся <strong>КОНФЛИКТ</strong>, а
+            <strong>текущее значение не установлено</strong>.
+          </div>
+        </div>
+
+        <div id="conflicts-container"></div>
+      </section>
+    </main>
+
+    <!-- Mobile Navigation Bottom Bar -->
+    <nav class="mobile-nav">
+      <div class="mob-item active" data-view="today" onclick="MetoRouter.navigate('today')">
+        <svg class="ui-icon"><use href="#icon-calendar"></use></svg>
+        <span>Сегодня</span>
+      </div>
+      <div class="mob-item" data-view="state" onclick="MetoRouter.navigate('state')">
+        <svg class="ui-icon"><use href="#icon-doc"></use></svg>
+        <span>Статус</span>
+      </div>
+      <div class="mob-item" data-view="decisions" onclick="MetoRouter.navigate('decisions')">
+        <svg class="ui-icon"><use href="#icon-check"></use></svg>
+        <span>Решения</span>
+      </div>
+      <div class="mob-item" data-view="conflicts" onclick="MetoRouter.navigate('conflicts')">
+        <svg class="ui-icon"><use href="#icon-conflict"></use></svg>
+        <span>Конфликты</span>
+      </div>
+    </nav>
+  </div>
+
+  <!-- 4. AUDITABLE MEMO DRAWER COMPONENT (#memo-drawer) -->
+  <div id="drawer-backdrop" class="drawer-backdrop" onclick="MetoDrawer.close()"></div>
+  <aside id="memo-drawer" class="memo-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" tabindex="-1">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-badges">
+          <span id="drawer-domain-badge" class="brand-pill">Сроки и релизы</span>
+          <span id="drawer-memo-badge" class="status-badge status-supported">
+            <span class="status-glyph">◈</span>
+            <span class="status-text">ПОДТВЕРЖДЕНО</span>
+          </span>
+          <span id="drawer-stale-badge" class="badge-stale" style="display: none;">
+            <svg class="ui-icon"><use href="#icon-stale"></use></svg>
+            <span id="drawer-stale-text">РАССИНХРОНИЗАЦИЯ: JIRA ОТСТАЁТ</span>
+          </span>
+        </div>
+        <h2 id="drawer-title" class="drawer-title">Заголовок факта</h2>
+      </div>
+      <button id="drawer-close-btn" class="drawer-close-btn" onclick="MetoDrawer.close()" aria-label="Закрыть панель">
+        <svg class="ui-icon"><use href="#icon-close"></use></svg>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="memo-grid">
+        <div class="memo-field full">
+          <div class="memo-field-label">ЧТО (Суть факта)</div>
+          <div id="drawer-what" class="memo-field-content"></div>
+        </div>
+        <div class="memo-field full">
+          <div class="memo-field-label">ПОЧЕМУ (Обоснование и предпосылки)</div>
+          <div id="drawer-why" class="memo-field-content"></div>
+        </div>
+        <div class="memo-field">
+          <div class="memo-field-label">БЫЛО (Предыдущее состояние)</div>
+          <div id="drawer-before" class="memo-field-content"></div>
+        </div>
+        <div class="memo-field">
+          <div class="memo-field-label">СТАЛО (Актуальный статус)</div>
+          <div id="drawer-after" class="memo-field-content"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">
+          <span>Первоисточники и верифицированные цитаты</span>
+          <span class="project-card-audit" style="font-size: 11px;">Прямая сверка</span>
+        </div>
+        <div id="drawer-quotes"></div>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">
+          <span>Хронология темпоральных изменений</span>
+        </div>
+        <div id="drawer-timeline" class="decisions-timeline" style="padding-left: 20px;"></div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn btn-secondary btn-sm" onclick="MetoDrawer.close()">Закрыть</button>
+      <button id="drawer-action-btn" class="btn btn-primary btn-sm" onclick="MetoApp.handleDrawerAction()">
+        Утвердить решение
+      </button>
+    </div>
+  </aside>
+
+  <!-- 5. RESOLUTION MODAL DIALOG (#resolution-modal) -->
+  <div id="resolution-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <h3 class="modal-title">Ратификация решения по СУБД</h3>
+      <p class="modal-desc">
+        Сейчас статус выбора СУБД находится в состоянии <strong>КОНФЛИКТ</strong>.
+        Выберите окончательное решение техсовета для перевода факта в статус <strong>УТВЕРЖДЕНО (CURRENT)</strong>.
+      </p>
+      <div class="modal-options">
+        <label class="modal-option">
+          <input type="radio" name="db_choice" value="PostgreSQL 16" checked>
+          <div>
+            <strong>Утвердить PostgreSQL 16 (ADR-04)</strong>
+            <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 2px;">
+              Строгая сериализуемость, аудит через WAL-G.
+            </div>
+          </div>
+        </label>
+        <label class="modal-option">
+          <input type="radio" name="db_choice" value="MySQL 8.0">
+          <div>
+            <strong>Утвердить MySQL 8.0 (Синхронизация команды)</strong>
+            <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 2px;">
+              Сохранение существующего шардинга в k8s.
+            </div>
+          </div>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary btn-sm" onclick="MetoApp.closeResolutionModal()">Отмена</button>
+        <button class="btn btn-primary btn-sm" onclick="MetoApp.submitResolution()">Зафиксировать в памяти</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-region" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
